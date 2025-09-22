@@ -9,12 +9,11 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager1 : MonoBehaviour
 {
-    [SerializeField] Gimmick01Manager gimmick01Manager;
+    [SerializeField] Game01Manager game01Manager;
 
     [SerializeField] LayerMask blockLayer;//ジャンプで使う
-
 
     public enum DIRECTION_TYPE//列挙型#方向の種類
     {
@@ -29,6 +28,15 @@ public class PlayerManager : MonoBehaviour
     float speed;
     Animator animator;
 
+    public bool eventFlag = false;//PlayerStop後に、マウスの座標を一度だけ送られないようにしている
+
+    Vector3 mouse_world_pos;//マウス座標
+    public Vector3 player01_pos;//プレイヤー座標
+
+    public Vector3 targetPos01;//
+
+    bool isMove = true;
+
     //SE
     /*[SerializeField] AudioClip getItemSE;
     [SerializeField] AudioClip jumpSE;
@@ -40,6 +48,7 @@ public class PlayerManager : MonoBehaviour
     //int spriteCount = 0;//多分無敵時間時代の点滅処理
 
     float jumpPower = 225;
+    float gravityPower = 10;
     bool isDead = false;//プレイヤーの生死
     bool isClear = false;//ステージクリアの有無
 
@@ -49,56 +58,82 @@ public class PlayerManager : MonoBehaviour
         rigidbody2D = GetComponent<Rigidbody2D>();//自分についているRigidbody取得
         //animator = GetComponent<Animator>();
         //audioSource = GetComponent<AudioSource>();
-    }
 
-    Vector3 mouse_world_pos;//マウス座標
-    Vector3 Player01_pos;//プレイヤー座標
+        targetPos01 = transform.position;
+       
+        direction = DIRECTION_TYPE.STOP;//止める
+
+        //GravityChange();
+    }
+    
     // Update is called once per frame
     private void Update()
     {
-        Player01_pos = this.transform.position;//プレイヤー座標保存
-        //Debug.Log(Player01_pos);
-
-        /*if (isDead || isClear)
+        if (game01Manager.isPause == true)
         {
-            return;
-        }*/
+            Time.timeScale = 0;
+            return;//isPause がtrue(ポーズ中)なら以下の処理をスキップ
+        }
+        if (game01Manager.isPause == false)
+        {
+            Time.timeScale = 1;
+        }
+
         if (Input.GetMouseButtonDown(0))//画面をタッチしたら
         {
+            if(eventFlag == true)
+            {
+                eventFlag = false;//PlayerStop後に、マウスの座標を一度だけ送られないようにしている
+                return;//
+            }
+            //  Player01_pos = this.transform.position;//プレイヤー座標保存
             Vector3 preMousePos = Input.mousePosition;//マウス座標保存
+            Debug.Log("マウス座標保存");
 
             //マウス座標を、スクリーン座標からワールド座標に変換
             mouse_world_pos = Camera.main.ScreenToWorldPoint(preMousePos);
 
-            if(mouse_world_pos.y >= 0)//画面の上半分の場合
+            if (mouse_world_pos.y >= 0 && transform.position.y >= 0)//画面の上半分の場合
             {
-                if (Player01_pos.x < mouse_world_pos.x)
-                {
-                    direction = DIRECTION_TYPE.RIGHT;//右へ
-                }
-                if(Player01_pos.x > mouse_world_pos.x)
-                {
-                    direction = DIRECTION_TYPE.LEFT;//左へ
-                }
+                targetPos01 = new Vector3(mouse_world_pos.x, 0, 0);
             }
-            else if (mouse_world_pos.y < 0)//画面の下半分の場合
+            /*else if(mouse_world_pos.y < 0 && transform.position.y < 0)
             {
-                return;//プレイヤーの動作はそのまま継続
-            }
+                TargetPos02 = new Vector3(mouse_world_pos.x, 0, 0);
+            }*/
 
         }
-        else if (direction == DIRECTION_TYPE.RIGHT && Player01_pos.x >= mouse_world_pos.x)
+
+        if (transform.position.x < targetPos01.x)
         {
-            direction = DIRECTION_TYPE.STOP;//止める
-            //Debug.Log("停止01");
+            direction = DIRECTION_TYPE.RIGHT;//右へ
         }
-        else if (direction == DIRECTION_TYPE.LEFT && Player01_pos.x <= mouse_world_pos.x)
+        if (transform.position.x > targetPos01.x)
         {
-            direction = DIRECTION_TYPE.STOP;//止める
-            //Debug.Log("停止02");
+            direction = DIRECTION_TYPE.LEFT;//左へ
         }
 
-        float x = Input.GetAxis("Horizontal");//横方向キーの入力を取得/wasd
+        if (direction == DIRECTION_TYPE.RIGHT)
+        {
+            if (Mathf.Abs(transform.position.x - targetPos01.x) <= 0.1f)//目的地の誤差0.1Fまで許容
+            {
+                direction = DIRECTION_TYPE.STOP;//止める
+            }
+        }
+        else if (direction == DIRECTION_TYPE.LEFT && player01_pos.x <= mouse_world_pos.x)
+        {
+
+            if (Mathf.Abs(transform.position.x - targetPos01.x) <= 0.1f)//目的地の誤差0.1Fまで許容
+            {
+                direction = DIRECTION_TYPE.STOP;//止める
+            }
+        }
+        if (direction == DIRECTION_TYPE.STOP)
+        {
+            //Debug.Log("1止まれ！");
+        }
+
+        //float x = Input.GetAxis("Horizontal");//横方向キーの入力を取得/wasd
 
         /*if (x == 0)
         {
@@ -130,7 +165,7 @@ public class PlayerManager : MonoBehaviour
             }*/
 
         }
-        if (JumpCount >= 500)//しばらくしたら/1600*10秒
+        if (JumpCount >= 300)//しばらくしたら/1600*10秒
         {
             //spriteCount = 0;
             isJump = false;//jampクールタイム解除
@@ -157,10 +192,23 @@ public class PlayerManager : MonoBehaviour
 
         }
 
+        /*if (game01Manager.weighitNumber == 1)//重力変更
+        {
+            Debug.Log("a");
+        }
+        else  if (game01Manager.weighitNumber == -1)
+        {
+            Debug.Log("b");
+        }*/
     }
 
     private void FixedUpdate()//決まった感覚で呼ばれるもの
     {
+        /*if (isPause == true)
+        {
+            return;//isPause が true なら以下の処理をスキップ
+        }*/
+
         if (isDead || isClear)
         {
             return;
@@ -193,7 +241,7 @@ public class PlayerManager : MonoBehaviour
         //audioSource.PlayOneShot(jumpSE);//SE
         //animator.SetBool("isjumping", true);
 
-        Debug.Log("Jump");
+        //Debug.Log("Jump");
     }
 
     bool IsGround()//地面についているかどうかの判定
@@ -220,16 +268,15 @@ public class PlayerManager : MonoBehaviour
             || Physics2D.Linecast(rightStartPoint, endPoint, blockLayer);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)//侵入時1度だけ※OnTriggerEnter2D/OnTriggerStay2D/OnTriggerExit2D
+    /*private void OnTriggerEnter2D(Collider2D collision)//侵入時1度だけ※OnTriggerEnter2D/OnTriggerStay2D/OnTriggerExit2D
     {
         if (collision.gameObject.tag == "Gimmick")
         {
-            Gimmick01Manager.isNotice01 = true;
             Debug.Log("なぁにこれぇ");
         }
 
-    }
-    private void OnTriggerExit2D(Collider2D collision)//脱出時1度だけ※OnTriggerEnter2D/OnTriggerStay2D/OnTriggerExit2D
+    }*/
+    /*private void OnTriggerExit2D(Collider2D collision)//脱出時1度だけ※OnTriggerEnter2D/OnTriggerStay2D/OnTriggerExit2D
     {
         if (collision.gameObject.tag == "Gimmick")
         {
@@ -237,6 +284,14 @@ public class PlayerManager : MonoBehaviour
             Debug.Log("意味不明");
         }
 
+    }*/
+
+    public void PlayerStop()
+    {
+        //ギミックが作動した際、不祥事が起こらないようにするため※テレポート等
+        targetPos01 = transform.position; //目標地点を現在地へ(移動停止)
+        eventFlag = true;//PlayerStop後に、マウスの座標を一度だけ送られないようにしている
+        Debug.Log("PlayerStop関数");
     }
 
 }

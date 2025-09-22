@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Gimmick
+  - Gimmicks
   layers:
   - Default
   - TransparentFX
