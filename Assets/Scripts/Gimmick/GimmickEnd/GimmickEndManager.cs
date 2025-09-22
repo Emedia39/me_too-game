@@ -9,7 +9,7 @@ public class GimmickEndManager : MonoBehaviour
 
     [SerializeField] GameObject End;
 
-    [SerializeField] GameObject Glow01of01;
+    //[SerializeField] GameObject Glow01of01;
 
     bool isEnd = false;//ステージギミック01の使用合否オンオフ
 
@@ -24,7 +24,9 @@ public class GimmickEndManager : MonoBehaviour
     {
         if (isEnd == true)
         {
-            game01Manager.isPause = true;
+            End.SetActive(true);//ゴールマーク表示
+
+            //game01Manager.isPause = true;
         }
 
     }
