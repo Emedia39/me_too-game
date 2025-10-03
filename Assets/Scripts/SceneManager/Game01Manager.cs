@@ -7,6 +7,10 @@ using UnityEngine.EventSystems;
 
 public class Game01Manager : MonoBehaviour
 {
+    //SE
+    [SerializeField] AudioClip gamePauseSE;//クリアSE
+    AudioSource audioSource;
+
     [SerializeField] Gimmick03of01Manager gimmick03of01Manager;
 
     [SerializeField] GameObject Player01;
@@ -30,6 +34,8 @@ public class Game01Manager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();//サウンド
+
         stageNumber = 1;//ステージ番号
         weighitNumber = 1;//重力番号 ※1=下 / -1= 上
 
@@ -75,6 +81,7 @@ public class Game01Manager : MonoBehaviour
     {
         if (isPause == false)//非ポーズ中の時
         {
+            audioSource.PlayOneShot(gamePauseSE);//SE
             Time.timeScale = 0;//時間停止
             isPause = true;//ポーズにする
             Pause.SetActive(true);//ポーズ一覧表示

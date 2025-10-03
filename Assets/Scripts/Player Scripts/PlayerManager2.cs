@@ -11,6 +11,10 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class PlayerManager2 : MonoBehaviour
 {
+    //SE
+    [SerializeField] AudioClip playerJumpSE;//ジャンプSE
+    AudioSource audioSource;
+
     [SerializeField] Game01Manager isPause;
 
     [SerializeField] LayerMask blockLayer;//ジャンプで使う
@@ -47,6 +51,8 @@ public class PlayerManager2 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();//サウンド
+
         rigidbody2D = GetComponent<Rigidbody2D>();//自分についているRigidbody取得
         //animator = GetComponent<Animator>();
         //audioSource = GetComponent<AudioSource>();
@@ -226,7 +232,7 @@ public class PlayerManager2 : MonoBehaviour
     {
         //上方向に力を加える
         GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpPower);
-        //audioSource.PlayOneShot(jumpSE);//SE
+        audioSource.PlayOneShot(playerJumpSE);//SE
         //animator.SetBool("isjumping", true);
 
         //Debug.Log("Jump");

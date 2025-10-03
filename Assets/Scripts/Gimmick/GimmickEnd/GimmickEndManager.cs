@@ -5,6 +5,10 @@ using UnityEngine.LowLevel;
 
 public class GimmickEndManager : MonoBehaviour
 {
+    //SE
+    [SerializeField] AudioClip gameEndSE;//クリアSE
+    AudioSource audioSource;
+
     Game01Manager game01Manager;
 
     [SerializeField] GameObject End;
@@ -16,7 +20,7 @@ public class GimmickEndManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        audioSource = GetComponent<AudioSource>();//サウンド
     }
 
     // Update is called once per frame
@@ -25,6 +29,7 @@ public class GimmickEndManager : MonoBehaviour
         if (isEnd == true)
         {
             End.SetActive(true);//ゴールマーク表示
+            audioSource.PlayOneShot(gameEndSE);//SE
 
             //game01Manager.isPause = true;
         }

@@ -5,10 +5,14 @@ using UnityEngine.SceneManagement;//シーン移行
 
 public class SelectManager : MonoBehaviour
 {
+    //SE
+    [SerializeField] AudioClip gameStartSE;//クリアSE
+    AudioSource audioSource;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        audioSource = GetComponent<AudioSource>();//サウンド
     }
 
     // Update is called once per frame
@@ -35,6 +39,7 @@ public class SelectManager : MonoBehaviour
     {
 
         //SceneManager.LoadScene("TitleScene");//シーン切り替え
+        audioSource.PlayOneShot(gameStartSE);
         Initiate.Fade("Game01Scene", Color.black, 1.0f);//移動先のシーン#色指定#フェードにかかる時間
     }
 
