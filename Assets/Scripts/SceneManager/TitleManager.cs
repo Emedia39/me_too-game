@@ -50,4 +50,13 @@ public class TitleManager : MonoBehaviour
         Initiate.Fade("EXPScene", Color.black, 1.0f);//移動先のシーン#色指定#フェードにかかる時間
     }
 
+    public void ExitGame()//ゲームを終了
+    {
+    #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;//ゲームを強制終了
+    #else//ビルドの場合
+            Application.Quit();
+    #endif
+    }
+
 }

@@ -171,7 +171,7 @@ public class PlayerManager1 : MonoBehaviour
             }*/
 
         }
-        if (JumpCount >= 300)//しばらくしたら/1600*10秒
+        if (JumpCount >= 200)//300/少し経ったら/
         {
             //spriteCount = 0;
             isJump = false;//jampクールタイム解除

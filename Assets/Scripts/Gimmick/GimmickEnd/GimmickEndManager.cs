@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
 
+
 public class GimmickEndManager : MonoBehaviour
 {
     //SE
     [SerializeField] AudioClip gameEndSE;//クリアSE
     AudioSource audioSource;
 
-    Game01Manager game01Manager;
+    [SerializeField] Game01Manager game01Manager;
 
     [SerializeField] GameObject End;
+    [SerializeField] GameObject PausuButton; 
+    [SerializeField] GameObject ResumeButton;
 
     //[SerializeField] GameObject Glow01of01;
 
@@ -29,9 +32,9 @@ public class GimmickEndManager : MonoBehaviour
         if (isEnd == true)
         {
             End.SetActive(true);//ゴールマーク表示
+            PausuButton.SetActive(false);//ポーズボタン表示
+            ResumeButton.SetActive(false);//再開ボタン表示
             audioSource.PlayOneShot(gameEndSE);//SE
-
-            //game01Manager.isPause = true;
         }
 
     }
@@ -42,6 +45,7 @@ public class GimmickEndManager : MonoBehaviour
         {
             isEnd = true;
             //Debug.Log("in");
+            game01Manager.isPause = true;
         }
 
     }
